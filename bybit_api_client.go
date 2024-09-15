@@ -7,7 +7,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"github.com/wuhewuhe/bybit.go.api/models"
 	"io"
 	"log"
 	"net/http"
@@ -15,6 +14,9 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/beevik/ntp"
+	"github.com/wuhewuhe/bybit.go.api/models"
 
 	"github.com/bitly/go-simplejson"
 	jsoniter "github.com/json-iterator/go"
@@ -127,6 +129,18 @@ func GetCurrentTime() int64 {
 	return timeStamp
 }
 
+// GetCurrentTimeFromNTP fetches the current time from an NTP server
+func GetCurrentTimeFromNTP() (int64, error) {
+	// Using "time.google.com" as a reliable NTP server
+	response, err := ntp.Time("time.google.com")
+	if err != nil {
+		return 0, err
+	}
+	unixNano := response.UnixNano()
+	timeStamp := unixNano / int64(time.Millisecond) // Convert to milliseconds
+	return timeStamp, nil
+}
+
 func newJSON(data []byte) (j *simplejson.Json, err error) {
 	j, err = simplejson.NewJson(data)
 	if err != nil {
@@ -188,7 +202,11 @@ func (c *Client) parseRequest(r *request, opts ...RequestOption) (err error) {
 	header.Set("User-Agent", fmt.Sprintf("%s/%s", Name, Version))
 
 	if r.secType == secTypeSigned {
-		timeStamp := GetCurrentTime()
+		timeStamp, err := GetCurrentTimeFromNTP()
+		if err != nil {
+			c.Logger.Printf("Error fetching current time from NTP: %v", err)
+			timeStamp = GetCurrentTime()
+		}
 		header.Set(signTypeKey, "2")
 		header.Set(apiRequestKey, c.APIKey)
 		header.Set(timestampKey, strconv.FormatInt(timeStamp, 10))
