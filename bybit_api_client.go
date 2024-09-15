@@ -126,7 +126,7 @@ func GetCurrentTime() int64 {
 	now := time.Now()
 	unixNano := now.UnixNano()
 	timeStamp := unixNano / int64(time.Millisecond)
-	return timeStamp
+	return timeStamp - 2500
 }
 
 // GetCurrentTimeFromNTP fetches the current time from an NTP server
@@ -202,11 +202,11 @@ func (c *Client) parseRequest(r *request, opts ...RequestOption) (err error) {
 	header.Set("User-Agent", fmt.Sprintf("%s/%s", Name, Version))
 
 	if r.secType == secTypeSigned {
-		timeStamp, err := GetCurrentTimeFromNTP()
-		if err != nil {
-			c.Logger.Printf("Error fetching current time from NTP: %v", err)
-			timeStamp = GetCurrentTime()
-		}
+		// timeStamp, err := GetCurrentTimeFromNTP()
+		// if err != nil {
+		// 	c.Logger.Printf("Error fetching current time from NTP: %v", err)
+		timeStamp := GetCurrentTime()
+		// }
 		header.Set(signTypeKey, "2")
 		header.Set(apiRequestKey, c.APIKey)
 		header.Set(timestampKey, strconv.FormatInt(timeStamp, 10))
