@@ -16,11 +16,11 @@ import (
 	"time"
 
 	"github.com/beevik/ntp"
-	"github.com/wuhewuhe/bybit.go.api/models"
+	"github.com/imJayanth/bybit.go.api/models"
 
 	"github.com/bitly/go-simplejson"
+	"github.com/imJayanth/bybit.go.api/handlers"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/wuhewuhe/bybit.go.api/handlers"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary

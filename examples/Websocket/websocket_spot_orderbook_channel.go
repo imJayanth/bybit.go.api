@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	bybit "github.com/wuhewuhe/bybit.go.api"
+	bybit "github.com/imJayanth/bybit.go.api"
 )
 
 func main() {
